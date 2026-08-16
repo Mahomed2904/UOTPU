@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uo-tpu-adapters"
+version = "0.1.0"
+description = "TPU detection adapters for UnderwaterObservserApp: shared Object/BBox types (common), Hailo TPU adapters (hailo), and Coral Edge TPU adapters (pycoral). Always installed together (hailo and pycoral both depend on common); pycoral's real runtime dependency is opt-in via the [pycoral] extra so the Hailo-only branch doesn't pull it in."
+requires-python = ">=3.7"
+dependencies = [
+    "numpy",
+    "Pillow",
+]
+
+[project.optional-dependencies]
+pycoral = ["pycoral~=2.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
