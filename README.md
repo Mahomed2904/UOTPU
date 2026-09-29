@@ -4,10 +4,8 @@ Python adapters for running detection/classification/segmentation models on **Ha
 **Google Coral Edge TPU** hardware behind one shared result type, so application code can target
 either accelerator without depending on their (very different) native SDKs directly.
 
-**This library is not specific to `UnderwaterObservserApp`.** It grew out of that project (a
-reef-monitoring device that runs on-device fish detection on Raspberry Pi + Hailo/Coral hardware),
-but nothing here depends on underwater imagery, fish detection, or that application's pipeline.
-Anything that needs to run inference on a Hailo TPU or a Coral Edge TPU — a different embedded
+Nothing here depends on a particular kind of imagery or application pipeline. Anything that
+needs to run inference on a Hailo TPU or a Coral Edge TPU — a different embedded
 vision project, a robotics application, any edge-inference workload — can depend on this package
 and get the same `Object`/`BBox` result types and adapter functions regardless of which of the
 two accelerators the target device has.
@@ -28,9 +26,6 @@ two accelerators the target device has.
     into lists of `Object`/`BBox` (or per-pixel masks, for segmentation).
   - `utils.hailotpu` — input-size/resize helpers used by the adapters.
 
-  Used by `UnderwaterObservserApp`'s `HailoTPUObjectDetector`, but the `Interpreter` and adapters
-  have no dependency on that class.
-
 - **`uo_tpu_adapters.pycoral`** — Coral Edge TPU support: `adapters.detect` /
   `adapters.classify` / `adapters.segment`, plus `utils` (dataset/EdgeTPU helpers), `learn`
   (on-device transfer learning: backprop softmax regression, weight imprinting), and `pipeline`
@@ -39,9 +34,6 @@ two accelerators the target device has.
   — its code does `from pycoral.pybind import _pywrap_coral`, an absolute import of the real,
   separately installed `pycoral~=2.0` package's compiled extension. That real package stays a
   genuine runtime dependency (install with the `pycoral` extra below) rather than being replaced.
-
-  Used by `UnderwaterObservserApp`'s `EdgeTPUObjectDetector`, with the same independence from that
-  class as the Hailo side.
 
 ## Usage
 
@@ -78,12 +70,10 @@ With the Coral Edge TPU `pycoral` dependency (Coral branch):
 pip install -e .[pycoral]
 ```
 
-## Origin
+The real `pycoral~=2.0` package is only published on Coral's own index, so add
+`--extra-index-url https://google-coral.github.io/py-repo/` when installing the `pycoral` extra.
 
-Originally three separate projects (`uo-common-types-lib`, `uo-hailo-adapters-lib`,
-`uo-pycoral-adapters-lib`), merged after determining the split added repo/packaging overhead
-without benefit — `hailo` and `pycoral` both hard-depend on `common` and are never versioned or
-installed independently of it. Both, in turn, trace back to
-`UnderwaterObservserApp/src/main/libs/{common,hailo,pycoral}/`, where they originated as vendored,
-in-tree code, and were pulled out into their own package so they can be reused and versioned
-independently of that application.
+As a pinned dependency:
+```
+pip install "uo-tpu-adapters[pycoral] @ git+ssh://git@github.com/Mahomed2904/UOTPU.git@v0.1.0"
+```
